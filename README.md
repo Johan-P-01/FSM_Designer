@@ -22,6 +22,11 @@ This is a tool that helps to design FSMs for hardware implementation. It uses AI
 - [ ] Undo button
 - [ ] For interactivity with AI: Be able to provide context about the state machine's purpose to the AI
 
-# AI usage
-* Project concept
-* React implementation
+---
+
+# Final implementation notes
+- The app is working in the way I would expect.
+- There are further improvements that can be made
+    - Removing states
+    - Better edge routing
+- Most of the implementation was done with the help of gemini flash 3.5
