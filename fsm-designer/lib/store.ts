@@ -18,6 +18,7 @@ import {
 interface FSMState {
     nodes: Node[];
     edges: Edge[];
+    nodeCounter: number;
     onNodesChange: OnNodesChange;
     onEdgesChange: OnEdgesChange;
     onConnect: OnConnect;
@@ -25,12 +26,16 @@ interface FSMState {
     addNode: () => void;
     updateNodeLabel: (id: string, label: string) => void;
     updateEdgeLabel: (id: string, label: string) => void;
+    systemContext: string;
+    setSystemContext: (context: string) => void;
+    loadProject: (data: { nodes: Node[]; edges: Edge[]; nodeCounter: number; systemContext: string }) => void;
+    resetProject: () => void;
 }
 
-// TODO: This needs expansion for renaming things
 export const useStore = create<FSMState>((set, get) => ({
-    nodes: [{ id: "1", position: { x: 100, y: 100 }, data: { label: "IDLE" }, type: "stateNode" }],
+    nodes: [{ id: "state_0", position: { x: 100, y: 100 }, data: { label: "INIT" }, type: "stateNode" }],
     edges: [],
+    nodeCounter: 1,
     onNodesChange: (changes: NodeChange[]) => {
         set({ nodes: applyNodeChanges(changes, get().nodes) });
     },
@@ -62,16 +67,19 @@ export const useStore = create<FSMState>((set, get) => ({
         });
     },
     addNode: () => {
-        // FIXME: Random is a bad way of assigning ids if not checking that clashes occur
-        const label = prompt("Name this state:") || "NEW_STATE";
-        const id = Math.random().toString(36).substr(2, 9);
+        const { nodeCounter, nodes } = get();
+        const label = prompt("Name this state:") || `STATE_${nodeCounter}`;
+        const sanitizedLabel = label.toUpperCase().replace(/\s+/g, "_");
+
+        const id = `node_${nodeCounter}`;
+
         const newNode = {
             id,
             type: "stateNode",
-            data: { label: label.toUpperCase() },
-            position: { x: Math.random() * 400, y: Math.random() * 400 },
+            data: { label: sanitizedLabel },
+            position: { x: 100, y: 250 },
         };
-        set({ nodes: [...get().nodes, newNode] });
+        set({ nodes: [...nodes, newNode], nodeCounter: nodeCounter + 1 });
     },
     updateNodeLabel: (id: string, label: string) => {
         set({
@@ -81,6 +89,31 @@ export const useStore = create<FSMState>((set, get) => ({
     updateEdgeLabel: (id: string, label: string) => {
         set({
             edges: get().edges.map((edge) => (edge.id === id ? { ...edge, label } : edge)),
+        });
+    },
+    systemContext: "Target: ARM Cortex-M4\nLanguage: C99\nConstraints: Minimal memory usage, no dynamic allocation.",
+    setSystemContext: (context: string) => set({ systemContext: context }),
+    loadProject: (data) => {
+        set({
+            nodes: data.nodes || [],
+            edges: data.edges || [],
+            nodeCounter: data.nodeCounter || 0,
+            systemContext: data.systemContext || "",
+        });
+    },
+    resetProject: () => {
+        const initialNode = {
+            id: "node_0",
+            type: "stateNode",
+            data: { label: "INIT" },
+            position: { x: 100, y: 100 },
+        };
+
+        set({
+            nodes: [initialNode],
+            edges: [],
+            nodeCounter: 1, // Start next node at 1
+            systemContext: "Target: ARM Cortex-M4...",
         });
     },
 }));

@@ -3,24 +3,32 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
 export async function POST(req: Request) {
-    const { nodes, edges } = await req.json();
+    const { nodes, edges, systemContext } = await req.json();
 
     // const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
 
+    const nodeMapping = nodes.map((n: any) => `${n.id} is labeled as "${n.data.label}"`).join(", ");
+
     const prompt = `
-    You are an expert Embedded Systems Engineer. 
-    I have a State Machine with the following states and transitions:
-    States: ${nodes.map((n: any) => n.data.label).join(", ")}
-    Transitions: ${edges.map((e: any) => `From ${e.source} to ${e.target} on event ${e.label}`).join("; ")}
-
-    Please generate:
-    1. A C header file (.h) using an ENUM for states and a switch-case state machine pattern.
-    2. An 'Audit' section: Point out missing safety states (like ERROR or TIMEOUT) or logical dead-ends.
+      You are an expert Embedded Systems Engineer. 
     
-    Use a professional firmware style (MISRA-C leaning).
+      CONTEXT: ${systemContext}
 
-    Return a JSON obect with the following format {"c_code" : ..., "audit" : ..., "}
+      MAP: ${nodeMapping}
+
+      TRANSITIONS: ${edges.map((e: any) => `From ${e.source} to ${e.target} on event ${e.label}`).join("; ")}
+
+      TASK:
+      Represent this State Machine as a JSON object with two fields:
+      1. "c_code": A complete header file (.h) with an example of how to use it. 
+      2. "audit": A safety audit of the logic formatted in RICH MARKDOWN. 
+        - Use headers (###) for sections.
+        - Use bolding for critical warnings.
+        - Use bullet points for suggestions.
+        - Use backticks for code symbols (e.g. \`STATE_IDLE\`).
+
+      Return ONLY valid JSON.
   `;
 
     try {
