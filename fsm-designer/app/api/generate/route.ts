@@ -25,7 +25,11 @@ export async function POST(req: Request) {
 
     try {
         const result = await model.generateContent(prompt);
-        return new Response(JSON.stringify({ output: result.response.text() }));
+        const responseText = result.response.text();
+
+        const cleanedJson = responseText.replace(/```json|```/g, "");
+        return new Response(cleanedJson);
+        // return new Response(JSON.stringify({output: ""}));
     } catch (error) {
         return new Response(JSON.stringify({ error: "API Key invalid or limit hit" }), { status: 500 });
     }
