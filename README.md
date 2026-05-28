@@ -6,21 +6,20 @@ This is a tool that helps to design FSMs for hardware implementation. It uses AI
 * AI interaction to give feedback and make improvements.
 * Code generation to setup the state machine and transitions.
     * C
-    * Verilog/VHDL
 
 # Tools used
 * React flow: I've never worked with React before, will try to setup a nice drag and drop interface.
-* AI APIs:
+* AI APIs: Gemini-3.5 Flash
 
 # Tasks
-- [ ] Implement diagramming tool
-- [ ] Store state machine in a datastructure that can be passed to AI
-- [ ] Call API at the click of a button
-- [ ] Get multiple outputs:
+- [x] Implement diagramming tool
+- [x] Store state machine in a datastructure that can be passed to AI
+- [x] Call API at the click of a button
+- [x] Get multiple outputs:
     - Natural language feedback
     - Suggestions to change the state machine (1-click implementation)
 - [ ] Undo button
-- [ ] For interactivity with AI: Be able to provide context about the state machine's purpose to the AI
+- [x] For interactivity with AI: Be able to provide context about the state machine's purpose to the AI
 
 ---
 
@@ -30,3 +29,6 @@ This is a tool that helps to design FSMs for hardware implementation. It uses AI
     - Removing states
     - Better edge routing
 - Most of the implementation was done with the help of gemini flash 3.5
+
+# To run
+- You will need an API key for gemini stored in a .env file
